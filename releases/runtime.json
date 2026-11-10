@@ -1,0 +1,20 @@
+{
+  "heading_source": "imu_yaw",
+  "stationary_gate": "standstill",
+  "label_frame": "world_lowpass",
+  "lag_compensation_s": 0.21000000000000002,
+  "window": 25,
+  "network_sha256": "ff2858e1cc46a00bdc04e595407c5c6e7e4a8d4f1697a11da4b3b7abfea99269",
+  "outputs": [
+    "velocity",
+    "velocity_cov",
+    "pose",
+    "pose_cov",
+    "uncertainty",
+    "quality"
+  ],
+  "pose_cov_order": "x, y, yaw; row-major 3x3",
+  "velocity_cov_order": "vx, vy; row-major 2x2",
+  "yaw_drift_deg_min_default": 1.0,
+  "simulation_heading": "ideal simulated IMU attitude; not hardware accuracy"
+}

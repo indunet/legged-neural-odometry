@@ -1,0 +1,36 @@
+{
+  "generation": "g1_planar",
+  "onnx_sha256": "ff2858e1cc46a00bdc04e595407c5c6e7e4a8d4f1697a11da4b3b7abfea99269",
+  "window": 25,
+  "mean_source": "ensemble",
+  "window_selection": {
+    "rule": "adopt 50 frames only if extra-validation mean endpoint error improves by >= 5%",
+    "scores": {
+      "25": {
+        "velocity_rmse": [
+          0.00553165421937548,
+          0.0047955804232017625
+        ],
+        "planar_rmse_sum": 0.010327234642577243,
+        "endpoint_mean_m": 0.03311956108586585,
+        "episodes": 260
+      },
+      "50": {
+        "velocity_rmse": [
+          0.010780092136307635,
+          0.015158858144748297
+        ],
+        "planar_rmse_sum": 0.02593895028105593,
+        "endpoint_mean_m": 0.07530666823659393,
+        "episodes": 260
+      }
+    },
+    "endpoint_gain": -1.2737821929872108,
+    "chosen_window": 25,
+    "data": "extra validation val+stop_val; world-low-pass labels; ideal yaw; lag compensation; no stationary gate"
+  },
+  "rule": "window, mean source and calibration from extra validation only; tests run after locking",
+  "labels_sha256": "3610923acc1d265e13cf6bb0dc1e117b76ca813fcea517cb00213645f762e1f8",
+  "trainer_sha256": "4b6ee9d34646f52cb852af44f278f72cc55d4ae2bd7ac7020f85c3e2af7215f6",
+  "training_data_sha256": "800fa6c567d90c579b4b05247c695de9ef21c453d5dc802b52dd01d4a3f0cffc"
+}

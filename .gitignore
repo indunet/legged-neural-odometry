@@ -1,0 +1,39 @@
+# Environments and caches
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+build/
+dist/
+
+# Local configuration (copy configs/resources.example.json)
+configs/resources.json
+
+# Large or reproducible working directories
+data/
+runs/
+outputs/
+third_party/
+archive/
+
+# Run artifacts
+*.log
+*.pid
+*.mp4
+*.mcap
+*.bag
+*.pt
+*.pth
+*.npz
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# ONNX files under releases/ are intentional release artifacts.

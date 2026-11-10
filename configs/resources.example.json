@@ -1,0 +1,5 @@
+{
+  "device": "cuda:0",
+  "render_gpu": 0,
+  "workers": 8
+}

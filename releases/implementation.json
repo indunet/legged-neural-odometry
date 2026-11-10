@@ -1,0 +1,35 @@
+{
+  "sha256": {
+    "g1_odom/__init__.py": "8da99c0c0e046845d3e0d97275403e9ed01a615244f09014a9e86330e56ba9c3",
+    "g1_odom/__main__.py": "1e528cbe432a91d9fb26caea31c05af077e8254d1fa22318c9f862d156e9765c",
+    "g1_odom/common.py": "69c5dff31afd2080d5642bea000bcf4e5bc979b15cfb3173e29fff2fd01adbe4",
+    "g1_odom/dataset.py": "24a159a91b88feb1b3fb6a12ebd5a5dc9a6d9d9a9787d2a371d7620591b2d2ec",
+    "g1_odom/evaluate.py": "595fa24cdef91c19b3da76a44a7086f2531bf4c1f48b0263cc8033725efa65b6",
+    "g1_odom/labels.py": "3610923acc1d265e13cf6bb0dc1e117b76ca813fcea517cb00213645f762e1f8",
+    "g1_odom/live.py": "8ef0387f6a0bb1d9e00c3cf88ca9e074e9e9b7fd89b99c120eb71b7fe0ac629f",
+    "g1_odom/model.py": "98640eb23339943d89a8dc43dd28df2ad342dea4a723ea0d52c624ee50f87769",
+    "g1_odom/planar_conditions.py": "8847e95e91fed11fdf0eb503fdb154f24b4daed1b7441232a978f9ab06e478be",
+    "g1_odom/runtime.py": "6f1775364cae64c3d9c549aa7b89993128d1e240867d6e1b55751c59ca8195b9",
+    "g1_odom/sensors.py": "be5e8a1b4bd77221744f12c661ae5e48f5c9ba949f8f52d433e3461e43254489",
+    "g1_odom/serve.py": "b8280c1c520d767f4920eb9a9ffb493733bc22ddfa49e15446561c67b658e742",
+    "g1_odom/simulation.py": "8e67d3791fe312fdcc42b7418d2b4c53bb95f5651ca7be72e7d92e1efc3b51e9",
+    "g1_odom/standstill.py": "cb5c363ab88ac5251d0f879edc54517f5cc3e8a45413eacd9f67467860e41d2e",
+    "g1_odom/train.py": "074a8effaaa15272250bba6e6f3822a4cd647abbd6d0372b3b42744d96da542e",
+    "g1_odom/trainer.py": "4b6ee9d34646f52cb852af44f278f72cc55d4ae2bd7ac7020f85c3e2af7215f6",
+    "g1_odom/training_data.py": "b4240541da737af3f76a1263197d8e3bd8e4d20a10115b7feaa5c12540b5cc6d",
+    "g1_odom/uncertainty.py": "41b926689d4eb0bdcc2b5b604b8c32556e259a156b83f4ccff8f6026c5c96e3d",
+    "g1_odom/workflow.py": "17dade2cbc2c40580b73f1367b3c016b99d5f2c4c3ef535080736a19ac850dde",
+    "run_web.sh": "f2314664e587ce1d300de5d430282092ae140614cbfeb3e74a82367e2743030b",
+    "scripts/bootstrap.sh": "165b8209f98796f96caaf9a9deaf1c5e01fd1b792b6b6faae1fd853a8a229a0f",
+    "scripts/fetch_assets.py": "86578e0b7fa4f588e2bcfd33776b8ff0d3271b54e8d4cfbc08bb2abde3982133",
+    "scripts/web_smoke.py": "105673242bc7ede64eb771cffe8d4f9f98bc6237298736f508d1351e9707c5b7",
+    "web/app.js": "808b1345f1b1a3254dfc1ae30cfacf3afc6baad8c5f6a1271d63dc3b304a8ff8",
+    "web/index.html": "fef468ad8478ab2342182edfd4065e4397ab2362906618f02dd173797aaa30ba",
+    "web/style.css": "3f59d72ab42076dc5f02b0ed0952fee3e40d39d71aaa51532c45f9cda9457c25"
+  },
+  "asset_manifest": "provenance/assets.json",
+  "environment": "requirements-lock.txt",
+  "notes": [
+    "500 Hz sensors, 50 Hz features, flat-ground G1 locomotion policy, single planar odometry release."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "rule": "adopt 50 frames only if extra-validation mean endpoint error improves by >= 5%",
+  "scores": {
+    "25": {
+      "velocity_rmse": [
+        0.00553165421937548,
+        0.0047955804232017625
+      ],
+      "planar_rmse_sum": 0.010327234642577243,
+      "endpoint_mean_m": 0.03311956108586585,
+      "episodes": 260
+    },
+    "50": {
+      "velocity_rmse": [
+        0.010780092136307635,
+        0.015158858144748297
+      ],
+      "planar_rmse_sum": 0.02593895028105593,
+      "endpoint_mean_m": 0.07530666823659393,
+      "episodes": 260
+    }
+  },
+  "endpoint_gain": -1.2737821929872108,
+  "chosen_window": 25,
+  "data": "extra validation val+stop_val; world-low-pass labels; ideal yaw; lag compensation; no stationary gate"
+}

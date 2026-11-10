@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g1-odom"
+version = "0.1.0"
+description = "Neural legged odometry with calibrated uncertainty for the Unitree G1 humanoid (simulation-trained)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+dependencies = [
+    "numpy>=1.26,<3",
+    "scipy>=1.11",
+    "onnxruntime>=1.18,<2",
+]
+
+[project.optional-dependencies]
+sim = ["mujoco==3.16.0", "Pillow>=10"]
+train = ["g1-odom[sim]", "torch==2.11.0", "onnx>=1.15"]
+dev = ["g1-odom[train]", "pytest>=8", "playwright>=1.40"]
+
+[project.scripts]
+g1-odom = "g1_odom.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+g1_odom = ["web/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

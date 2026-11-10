@@ -1,0 +1,33 @@
+{
+  "note": "labels integrated as if the network were perfect; positions against the true pelvis pose",
+  "splits": {
+    "train": {
+      "episodes": 2000,
+      "frames": 3187816,
+      "heading_frame_label_endpoint_mean_m": 0.12263550946473566,
+      "label_with_compensation_max_error_mean_m": 4.177235840135351e-05,
+      "label_with_compensation_max_error_max_m": 0.00013109432200152874
+    },
+    "stop_train": {
+      "episodes": 600,
+      "frames": 956854,
+      "heading_frame_label_endpoint_mean_m": 0.04184272818488067,
+      "label_with_compensation_max_error_mean_m": 2.1303838509134782e-05,
+      "label_with_compensation_max_error_max_m": 9.331342574469569e-05
+    },
+    "val": {
+      "episodes": 200,
+      "frames": 319826,
+      "heading_frame_label_endpoint_mean_m": 0.10950195133482127,
+      "label_with_compensation_max_error_mean_m": 4.18794935621625e-05,
+      "label_with_compensation_max_error_max_m": 0.00015359920164897305
+    },
+    "stop_val": {
+      "episodes": 60,
+      "frames": 92685,
+      "heading_frame_label_endpoint_mean_m": 0.03412077337594459,
+      "label_with_compensation_max_error_mean_m": 1.9607385641631242e-05,
+      "label_with_compensation_max_error_max_m": 4.7476186130874884e-05
+    }
+  }
+}

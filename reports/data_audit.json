@@ -1,0 +1,48 @@
+{
+  "pass": true,
+  "data_root": "/root/g1_odometry/data/g1_planar",
+  "errors": [],
+  "splits": {
+    "test_ood": {
+      "episodes": 60,
+      "falls": 23,
+      "uncalibrated": 0
+    },
+    "val": {
+      "episodes": 200,
+      "falls": 0,
+      "uncalibrated": 0
+    },
+    "stop_train": {
+      "episodes": 600,
+      "falls": 0,
+      "uncalibrated": 0
+    },
+    "train": {
+      "episodes": 2000,
+      "falls": 0,
+      "uncalibrated": 0
+    },
+    "odometry": {
+      "episodes": 30,
+      "falls": 0,
+      "uncalibrated": 0
+    },
+    "stop_val": {
+      "episodes": 60,
+      "falls": 0,
+      "uncalibrated": 0
+    },
+    "test_iid": {
+      "episodes": 100,
+      "falls": 0,
+      "uncalibrated": 0
+    },
+    "stop_test": {
+      "episodes": 60,
+      "falls": 0,
+      "uncalibrated": 0
+    }
+  },
+  "files_sha256": "0008964112e3dd97482cf5eaa6b642b43cb3c78e7b6efa48f660454fff9f2656"
+}

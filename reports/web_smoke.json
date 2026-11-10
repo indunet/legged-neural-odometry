@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "browser_errors": [],
+  "verified": [
+    "live rendered G1",
+    "telemetry with uncertainty",
+    "velocity control",
+    "pause/resume",
+    "reset",
+    "training and report page",
+    "worker cleanup"
+  ]
+}
