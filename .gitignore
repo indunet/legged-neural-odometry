@@ -10,6 +10,9 @@ __pycache__/
 .coverage
 build/
 dist/
+target/
+.deb-build/
+*.deb
 
 # Local configuration (copy configs/resources.example.json)
 configs/resources.json
@@ -22,6 +25,7 @@ third_party/
 archive/
 
 # Run artifacts
+log/
 *.log
 *.pid
 *.mp4

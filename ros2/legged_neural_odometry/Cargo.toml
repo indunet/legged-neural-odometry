@@ -1,0 +1,27 @@
+[package]
+name = "legged_neural_odometry"
+version = "1.0.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+description = "Unitree G1 neural planar odometry for ROS 2 Humble"
+
+[lib]
+name = "legged_neural_odometry"
+path = "src/lib.rs"
+
+[[bin]]
+name = "legged_neural_odometry"
+path = "src/bin/legged_neural_odometry.rs"
+required-features = ["ros"]
+
+[features]
+ros = ["dep:r2r", "dep:futures"]
+
+[dependencies]
+ndarray = "0.17"
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "ndarray", "load-dynamic", "api-31"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+futures = { version = "0.3", optional = true }
+r2r = { version = "0.9.7", optional = true }

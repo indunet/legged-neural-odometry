@@ -45,21 +45,25 @@ result = odom.update(SensorSample(t, gyro, accel, q, dq, imu_yaw=yaw, imu_yaw_t=
 
 ## 完整环境（仿真、训练、Web）
 
+没有 NVIDIA GPU 时用 CPU 环境（Python 3.12、uv、Linux，渲染需要系统库 `libosmesa6`）：
+
 ```bash
-bash scripts/bootstrap.sh      # 需要 Python 3.12、uv、Linux，以及匹配锁定 PyTorch CUDA 版本的 NVIDIA 驱动
+bash scripts/bootstrap-cpu.sh  # CPU 版 PyTorch，不安装 nvidia / CUDA 包
 .venv/bin/python -m g1_odom fetch --verify
 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m pytest
 scripts/run_web.sh             # http://127.0.0.1:18078
 ```
 
+有匹配驱动的 NVIDIA GPU 时，仍可用 `bash scripts/bootstrap.sh`（按 `requirements-lock.txt` 安装 CUDA 版 PyTorch）。
+
 常用命令（也可用 `g1-odom <command>`）：
 
 | 命令 | 作用 |
 |---|---|
-| `python -m g1_odom run --device cuda:0` | 采集 → 审计 → 训练 → 校准 → 评测，每个阶段可中断恢复 |
+| `python -m g1_odom run --device cpu` | 采集 → 审计 → 训练 → 校准 → 评测，每个阶段可中断恢复 |
 | `python -m g1_odom collect` | 只采集仿真数据 |
 | `python -m g1_odom serve` | 启动 Web 控制台 |
-| `python -m g1_odom fetch --verify` | 获取并校验固定版本的第三方资源 |
+| `python -m g1_odom fetch --verify` | 校验 `assets/unitree_g1/` 与锁定哈希一致 |
 
 复现步骤、各阶段说明和资源配置见 [docs/development.md](docs/development.md)。
 
@@ -81,17 +85,18 @@ scripts/run_web.sh             # http://127.0.0.1:18078
 │   ├── serve.py, live.py, web/          Web 控制台
 │   └── __main__.py       命令行入口
 ├── tests/              pytest 测试
-├── scripts/            bootstrap、资源获取、Web 冒烟测试、启动脚本
-├── configs/            资源配置示例与第三方资源锁定清单（assets.lock.json）
+├── scripts/            bootstrap、资源校验、Web 冒烟测试、启动脚本
+├── configs/            资源配置示例与资源锁定清单（assets.lock.json）
+├── assets/unitree_g1/  随仓库提供的 G1 模型、网格和步行策略（见 NOTICE.md）
 ├── releases/           发布的 ONNX 模型、校准参数与元数据
 ├── reports/            评测报告与各阶段审计结果
 ├── docs/               使用、方法与开发文档
-└── data/ runs/ outputs/ third_party/   本地生成目录（Git 忽略）
+└── data/ runs/ outputs/   本地生成目录（Git 忽略）
 ```
 
 ## 许可证与第三方资源
 
-本项目代码、发布的模型与文档采用 [Apache License 2.0](LICENSE)。该许可证**不适用于**第三方资源（如 Unitree RL Mjlab 的策略和机器人模型），
-其来源和条款说明见 [NOTICE.md](NOTICE.md)。训练数据、依赖、下载资源、检查点和运行文件都被 Git 忽略，发布的 ONNX、源码、配置和报告可以纳入 Git。
+本项目代码、发布的模型与文档采用 [Apache License 2.0](LICENSE)。该许可证**不适用于** `assets/unitree_g1/` 里的宇树机器人模型和步行策略，
+其来源和条款说明见 [NOTICE.md](NOTICE.md)。训练数据、依赖、检查点和运行文件都被 Git 忽略，发布的 ONNX、源码、配置和报告可以纳入 Git。
 
 欢迎贡献，请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。

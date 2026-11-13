@@ -1,5 +1,8 @@
 {
-  "device": "cuda:0",
-  "render_gpu": 0,
+  "device": "cpu",
+  "render_gl": "osmesa",
+  "render_width": 1280,
+  "render_height": 720,
+  "render_fps": 30,
   "workers": 8
 }

@@ -8,8 +8,8 @@ import onnxruntime as ort
 from .common import ROOT, DT, JOINTS
 from .sensors import SensorSample
 
-FLAT_ROOT = ROOT/'third_party/unitree_rl_mjlab'
-FLAT_POLICY = FLAT_ROOT/'deploy/robots/g1/config/policy/velocity/v0/exported/policy.onnx'
+G1_ROOT = ROOT/'assets/unitree_g1'
+FLAT_POLICY = G1_ROOT/'policy.onnx'
 
 def session(path):
     opt = ort.SessionOptions()
@@ -65,7 +65,7 @@ class Policy:
         data.ctrl[self.aids] = np.clip(value, self.limits[:, 0], self.limits[:, 1])
 
 def build_model(policy):
-    xml_path = FLAT_ROOT/'src/assets/robots/unitree_g1/xmls/g1.xml'
+    xml_path = G1_ROOT/'g1.xml'
     root = ET.parse(xml_path).getroot()
     compiler = root.find('compiler')
     compiler.set('meshdir', str((xml_path.parent/compiler.get('meshdir', '.')).resolve()))

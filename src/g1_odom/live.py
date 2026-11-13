@@ -49,12 +49,25 @@ class HeadingHold:
         error=(self.target-yaw+np.pi)%(2*np.pi)-np.pi
         drive=command.copy();drive[2]=float(np.clip(HEADING_GAIN*error,-HEADING_LIMIT,HEADING_LIMIT));return drive
 
+def render_config():
+    """CPU software rendering unless resources.json or MUJOCO_GL says otherwise."""
+    resource=ROOT/'configs/resources.json'
+    cfg=json.loads(resource.read_text()) if resource.exists() else {}
+    backend=os.environ.get('MUJOCO_GL') or cfg.get('render_gl') or 'osmesa'
+    os.environ['MUJOCO_GL']=backend
+    if backend=='egl':
+        os.environ['MUJOCO_EGL_DEVICE_ID']=str(cfg.get('render_gpu',0))
+        os.environ['PYOPENGL_PLATFORM']='egl'
+    elif backend=='osmesa':
+        os.environ['PYOPENGL_PLATFORM']='osmesa'
+    width=int(cfg.get('render_width',WIDTH))
+    height=int(cfg.get('render_height',HEIGHT))
+    fps=float(cfg.get('render_fps',FPS))
+    return width,height,fps
+
 def run(folder):
     folder=Path(folder);config=json.loads((folder/'config.json').read_text())
-    resource=ROOT/'configs/resources.json'
-    gpu=json.loads(resource.read_text()).get('render_gpu',6) if resource.exists() else 6
-    os.environ['MUJOCO_GL']='egl';os.environ['MUJOCO_EGL_DEVICE_ID']=str(gpu)
-    os.environ['PYOPENGL_PLATFORM']='egl'
+    width,height,fps=render_config()
     import mujoco
     import numpy as np
     from PIL import Image
@@ -65,8 +78,8 @@ def run(folder):
     model=ROOT/config['model'] if config.get('model') else None
     if model is not None:model.resolve().relative_to(ROOT)
     estimator=Odometry(model=model)
-    sim.model.vis.global_.offwidth=WIDTH;sim.model.vis.global_.offheight=HEIGHT
-    renderer=mujoco.Renderer(sim.model,height=HEIGHT,width=WIDTH)
+    sim.model.vis.global_.offwidth=width;sim.model.vis.global_.offheight=height
+    renderer=mujoco.Renderer(sim.model,height=height,width=width)
     camera=mujoco.MjvCamera();camera.distance=3.3;camera.azimuth=135;camera.elevation=-24
     heading=HeadingHold();command=np.zeros(3);paused=False;rows=[];origin=None;control_mtime=0
     last_wall=time.monotonic();last_sim=0.;last_render=-1.;last_frame_wall=0.;last_state_wall=0.
@@ -98,7 +111,7 @@ def run(folder):
                                  'sigma_xy':sigma,'epistemic_speed_std':speed,'quality':result['quality']})
                     rows=rows[-10000:]
             now=time.monotonic()
-            if sim.data.time-last_render>=1/FPS or ((paused or sim.fallen()) and now-last_frame_wall>=.2):
+            if sim.data.time-last_render>=1/fps or ((paused or sim.fallen()) and now-last_frame_wall>=.2):
                 camera.lookat[:]=sim.data.xpos[sim.base]
                 renderer.update_scene(sim.data,camera=camera)
                 add_grid(mujoco,renderer.scene,*sim.data.xpos[sim.base][:2])

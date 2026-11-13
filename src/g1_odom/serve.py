@@ -87,7 +87,7 @@ class App:
         if running:return {'ok':True,'message':'采样或训练流程正在运行','pids':running}
         if self.job and self.job.poll() is None:return {'ok':True,'message':'任务正在运行'}
         log=open(ROOT/'runs/workflow.log','a')
-        device=read_json(ROOT/'configs/resources.json').get('device','cuda:6')
+        device=read_json(ROOT/'configs/resources.json').get('device','cpu')
         self.job=subprocess.Popen([sys.executable,'-m','g1_odom','run','--device',device],cwd=ROOT,stdout=log,
                                   stderr=subprocess.STDOUT,start_new_session=True,
                                   env=dict(os.environ,OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1'))

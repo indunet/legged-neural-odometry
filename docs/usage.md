@@ -54,5 +54,31 @@ scripts/run_web.sh               # http://127.0.0.1:18078，可指定 --host 0.0
   速度指令、轨迹、速度曲线、水平误差与 2σ 曲线、位置 1σ 和估计质量以半透明面板悬浮在画面上。右上角按钮或按 `H` 键可隐藏／显示面板。
 - 「训练与报告」页：数据、流程阶段与发布状态，可启动／停止流程，并显示精度、不确定度覆盖率和在线回归结果。
 
-平地步行使用 Unitree 官方 Mjlab G1 velocity 策略，它只驱动仿真，与里程计网络无关。服务默认只监听本机，没有用户鉴权；
+平地步行使用宇树官方 G1 velocity 策略（`assets/unitree_g1/policy.onnx`，普通 MuJoCo 加载，不需要 mjlab）。它只驱动仿真，与里程计网络无关。服务默认只监听本机，没有用户鉴权；
 如需远程访问，可用 SSH 端口转发或指定监听地址。
+
+## ROS 2 节点
+
+`ros2/legged_neural_odometry` 是 ROS 2 Humble 节点。它订阅 `/lowstate`（`unitree_hg/msg/LowState`，reliable、keep-last 10），取 G1 SDK 关节下标 `0, 1, 2, 3, 6, 7, 8, 9`（左右腿的 hip_pitch、hip_roll、hip_yaw、knee）和 `imu_state` 的陀螺、加速度、`rpy[2]`。特征就绪后以约 50 Hz 发布 `/g1/odom`（`nav_msgs/Odometry`）。`frame_id` 默认 `odom`，`child_frame_id` 默认 `pelvis`。位姿相对首次就绪时刻。`twist.linear.x/y` 是航向系速度，`angular.z` 是闭合该帧的陀螺 z。重置服务是 `/legged_neural_odometry/reset`。
+
+`LowState` 没有时间戳，节点用自己的时钟。间隔超过 100 ms、时间倒退或出现非有限值时重置估计器。静止标定完成前，以及窗口未满时，不发布里程计。加速度静止时应接近 9.81 m/s²；若一直不发布，日志里的加速度模长可以用来判断驱动是否把加速度发成了 g。
+
+`unitree_hg` 消息定义放在 `ros2/unitree_hg`，只含 `LowState`、`IMUState`、`MotorState`，字段与宇树 `/lowstate` 一致。编译、打包和运行都不再依赖 `uqi-r11-robot-interface`。宇树侧升级 `LowState` 字段时，要同步更新这份拷贝，否则反序列化会错位。
+
+开发机上只需 source ROS 2 Humble：
+
+```bash
+colcon build --base-paths ros2 --packages-select unitree_hg legged_neural_odometry
+source install/setup.bash
+ros2 launch legged_neural_odometry legged_neural_odometry.launch.py
+```
+
+打包、安装和卸载：
+
+```bash
+bash scripts/build-deb.sh
+sudo dpkg -i legged-neural-odometry_1.0.0_$(dpkg --print-architecture).deb
+sudo dpkg -r legged-neural-odometry
+```
+
+deb 装到 `/opt/legged-neural-odometry`，包名和服务都是 `legged-neural-odometry`。安装结束后 `legged-neural-odometry.service` 会启动；`/lowstate` 还没有数据时节点保持运行。卸载会停掉服务并取消开机启动。版本号来自 `pyproject.toml`，当前是 1.0.0。

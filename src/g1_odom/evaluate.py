@@ -408,5 +408,5 @@ def make_report(result):
               '- 速度误差参考世界系 0.2 s 低通标签；位置误差参考实际骨盆位置，只做初始位姿对齐；跌倒段保留。',
               '- Huber(delta=0.1) 在残差约 0.005 m/s 时等价于均方误差。',
               '- 不确定度是仿真内的统计校准；真机步态、IMU 安装误差和时延不在训练分布内，届时应以种子间分歧告警为准并重新校准。',
-              '- 复现：`.venv/bin/python -m g1_odom run --device cuda:6`。', '']
+              '- 复现：`.venv/bin/python -m g1_odom run --device cpu`。', '']
     (REPORT/'report.md').write_text('\n'.join(lines))

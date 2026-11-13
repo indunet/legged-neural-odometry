@@ -1,0 +1,2 @@
+[env]
+IDL_PACKAGE_FILTER = { value = "builtin_interfaces;std_msgs;geometry_msgs;nav_msgs;std_srvs;rcl_interfaces;rosgraph_msgs;unique_identifier_msgs;action_msgs;service_msgs;unitree_hg" }
