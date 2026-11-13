@@ -3,7 +3,7 @@
   <name>unitree_hg</name>
   <version>1.0.0</version>
   <description>LowState, IMUState and MotorState copied from the Unitree HG interface. Field layout must stay identical to the robot /lowstate publisher. Bundled so this workspace does not depend on uqi-r11-robot-interface.</description>
-  <maintainer email="dev@example.com">legged-neural-odometry</maintainer>
+  <maintainer email="deng_ran@aliyun.com">Deng Ran</maintainer>
   <license>BSD-3-Clause</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

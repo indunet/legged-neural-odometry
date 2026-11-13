@@ -3,7 +3,7 @@
   <name>legged_neural_odometry</name>
   <version>1.0.0</version>
   <description>Unitree G1 neural planar odometry node.</description>
-  <maintainer email="dev@example.com">legged-neural-odometry</maintainer>
+  <maintainer email="deng_ran@aliyun.com">Deng Ran</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

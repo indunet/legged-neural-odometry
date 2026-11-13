@@ -1,0 +1,117 @@
+name: release
+
+# The only workflow in this repository. When a GitHub Release is published it builds the ROS 2 Humble
+# Debian packages (amd64 + arm64) and attaches them to that release, together with SHA-256 checksums
+# and the released ONNX model. "Run workflow" (workflow_dispatch) builds the debs and keeps them as
+# workflow artifacts only; nothing is published.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ORT_VERSION: "1.31.0"
+
+jobs:
+  build-deb:
+    name: deb (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    container: ros:humble-ros-base
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-22.04
+            ort_arch: x64
+          - arch: arm64
+            runner: ubuntu-22.04-arm
+            ort_arch: aarch64
+    steps:
+      - name: Install system packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential cmake git curl ca-certificates pkg-config \
+            clang libclang-dev fakeroot dpkg-dev python3 \
+            python3-colcon-common-extensions \
+            ros-humble-rosidl-default-generators \
+            ros-humble-nav-msgs ros-humble-geometry-msgs \
+            ros-humble-std-msgs ros-humble-std-srvs ros-humble-rcl
+
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: cargo-${{ matrix.arch }}-${{ hashFiles('ros2/legged_neural_odometry/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.arch }}-
+
+      - name: Install ONNX Runtime ${{ env.ORT_VERSION }}
+        run: |
+          mkdir -p /opt/onnxruntime
+          curl -fsSL "https://github.com/microsoft/onnxruntime/releases/download/v${ORT_VERSION}/onnxruntime-linux-${{ matrix.ort_arch }}-${ORT_VERSION}.tgz" \
+            | tar -xz -C /opt/onnxruntime
+
+      - name: Build deb
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          # On a release the tag (vX.Y.Z) must match pyproject.toml, Cargo.toml and package.xml.
+          if [ -n "${RELEASE_TAG}" ]; then
+            export EXPECT_VERSION="${RELEASE_TAG#v}"
+          fi
+          bash scripts/build-deb.sh
+
+      - name: Inspect and checksum
+        working-directory: dist
+        run: |
+          for f in *.deb; do
+            dpkg-deb --info "$f"
+            dpkg-deb --contents "$f" | head -n 40
+            sha256sum "$f" > "$f.sha256"
+          done
+          ls -l
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ matrix.arch }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: attach to release
+    if: github.event_name == 'release'
+    needs: build-deb
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: deb-*
+          path: dist
+          merge-multiple: true
+
+      - name: Upload assets to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          cp releases/estimator.onnx releases/calibration.json dist/
+          ls -l dist
+          gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"

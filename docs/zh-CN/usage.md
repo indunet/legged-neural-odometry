@@ -1,3 +1,5 @@
+[English](../usage.md) | **简体中文**
+
 # 使用方法
 
 ## 推理接口
@@ -50,7 +52,7 @@ scripts/run_web.sh               # http://127.0.0.1:18078，可指定 --host 0.0
 
 页面分两页：
 
-- 「里程计」页：整个页面背景就是实时 G1 平地仿真画面（MuJoCo 离屏渲染，1280×720、30 帧/秒，以 MJPEG 视频流 `/api/stream` 推送）；
+- 「里程计」页：整个页面背景就是实时 G1 平地仿真画面（MuJoCo 离屏渲染，1280×720、15 帧/秒，以 MJPEG 视频流 `/api/stream` 推送）；
   速度指令、轨迹、速度曲线、水平误差与 2σ 曲线、位置 1σ 和估计质量以半透明面板悬浮在画面上。右上角按钮或按 `H` 键可隐藏／显示面板。
 - 「训练与报告」页：数据、流程阶段与发布状态，可启动／停止流程，并显示精度、不确定度覆盖率和在线回归结果。
 
@@ -73,12 +75,12 @@ source install/setup.bash
 ros2 launch legged_neural_odometry legged_neural_odometry.launch.py
 ```
 
-打包、安装和卸载：
+打包、安装和卸载（也可以直接从 GitHub 发布页下载 amd64 / arm64 的 deb，由 `.github/workflows/release.yml` 在发布 Release 时构建）：
 
 ```bash
-bash scripts/build-deb.sh
-sudo dpkg -i legged-neural-odometry_1.0.0_$(dpkg --print-architecture).deb
+bash scripts/build-deb.sh      # 输出到 dist/
+sudo dpkg -i dist/legged-neural-odometry_1.0.0_$(dpkg --print-architecture).deb
 sudo dpkg -r legged-neural-odometry
 ```
 
-deb 装到 `/opt/legged-neural-odometry`，包名和服务都是 `legged-neural-odometry`。安装结束后 `legged-neural-odometry.service` 会启动；`/lowstate` 还没有数据时节点保持运行。卸载会停掉服务并取消开机启动。版本号来自 `pyproject.toml`，当前是 1.0.0。
+deb 装到 `/opt/legged-neural-odometry`，包名和服务都是 `legged-neural-odometry`。安装结束后 `legged-neural-odometry.service` 会启动；`/lowstate` 还没有数据时节点保持运行。卸载会停掉服务并取消开机启动。版本号来自 `pyproject.toml`，当前是 1.0.0；构建会检查它与 `Cargo.toml`、`package.xml` 一致。

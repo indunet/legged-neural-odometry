@@ -1,15 +1,17 @@
+[English](../development.md) | **简体中文**
+
 # 开发与复现
 
 ## 环境
 
 ```bash
-bash scripts/bootstrap-cpu.sh    # Python 3.12、uv、Linux；CPU 版 PyTorch，不需要 NVIDIA 驱动
+bash scripts/setup.sh            # Python 3.12、uv、Linux；默认 CPU 版 PyTorch，不需要 NVIDIA 驱动
 sudo apt install libosmesa6      # MuJoCo 离屏渲染（无 GPU 时）
 .venv/bin/python -m g1_odom fetch --verify
 ```
 
-有 NVIDIA GPU 时可以用 `bash scripts/bootstrap.sh`，它按 `requirements-lock.txt` 安装 CUDA 版 PyTorch。
-两个脚本都以可编辑模式安装本包（`pip install -e .`），并校验 `assets/unitree_g1/`。
+有匹配驱动的 NVIDIA GPU 时用 `bash scripts/setup.sh --cuda` 安装 CUDA 版 PyTorch。
+依赖只在 `pyproject.toml` 中声明；脚本以可编辑模式安装本包（`pip install -e ".[dev]"`），并校验 `assets/unitree_g1/`。
 项目使用 `src/` 布局，子进程通过 `python -m g1_odom...` 启动，因此需要先完成可编辑安装。
 `pyproject.toml` 中的可选依赖：`sim`（MuJoCo 仿真）、`train`（PyTorch/ONNX 训练）、`dev`（测试与浏览器冒烟测试）。
 
@@ -18,7 +20,9 @@ G1 模型和步行策略放在 `assets/unitree_g1/`，来源与校验和记录�
 
 本地资源配置：复制 `configs/resources.example.json` 为 `configs/resources.json`（Git 忽略）。
 默认 `device` 为 `cpu`，`render_gl` 为 `osmesa`。有 GPU 时可把 `render_gl` 设为 `egl` 并设置 `render_gpu`。
-`render_width`、`render_height`、`render_fps` 控制 Web 实时画面；已经设置的 `MUJOCO_GL` 环境变量优先于配置文件。
+`render_width`、`render_height`、`render_fps`（默认 15，按真实时间计）控制 Web 实时画面；
+`render_shadows`（默认 `false`）开启阴影和 4 倍 MSAA，在 `osmesa` 下每帧约多 250 ms，建议只在 `egl` 下开启。
+已经设置的 `MUJOCO_GL` 环境变量优先于配置文件。
 
 ## 复现完整流程
 
@@ -51,3 +55,10 @@ PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/browsers" .venv/bin/python scripts/web_smo
 ## Git
 
 训练数据、依赖、检查点和运行文件都被 Git 忽略；`assets/unitree_g1/`、发布的 ONNX、源码、配置、报告可以纳入 Git。
+
+## 发布
+
+只有一个 GitHub Actions 工作流 `.github/workflows/release.yml`：发布 GitHub Release（标签 `vX.Y.Z`）时，在 ROS 2 Humble 容器里分别于
+amd64 和 arm64 runner 上运行 `scripts/build-deb.sh`，并把 deb、`.sha256`、`estimator.onnx`、`calibration.json` 挂到该 Release。
+标签必须与 `pyproject.toml`、`Cargo.toml`、`package.xml` 的版本一致。本地打包：`bash scripts/build-deb.sh`，输出在 `dist/`
+（需要 ROS 2 Humble、Rust、`fakeroot` 和 ONNX Runtime 1.31）。详见 [CONTRIBUTING.md](../../CONTRIBUTING.md)。

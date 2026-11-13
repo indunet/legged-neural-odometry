@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# Build legged-neural-odometry_<version>_<arch>.deb.
+# Build dist/legged-neural-odometry_<version>_<arch>.deb for ROS 2 Humble.
 # The package installs under /opt/legged-neural-odometry and enables
 # legged-neural-odometry.service. Remove it with: dpkg -r legged-neural-odometry
+#
+# Environment:
+#   ORT_DYLIB_PATH   path to libonnxruntime.so (1.31.x); auto-detected under
+#                    /opt/onnxruntime/onnxruntime-linux-<arch>-1.31.0/lib otherwise
+#   EXPECT_VERSION   if set (e.g. 1.2.3 from tag v1.2.3), fail unless all package versions match
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -13,6 +18,15 @@ if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   exit 1
 fi
 echo "build-deb: VERSION=${VERSION}" >&2
+
+CARGO_VERSION="$(sed -n 's/^version = "\([^"]*\)"/\1/p' ros2/legged_neural_odometry/Cargo.toml | head -1)"
+PKG_XML_VERSION="$(sed -n 's|.*<version>\([^<]*\)</version>.*|\1|p' ros2/legged_neural_odometry/package.xml | head -1)"
+for v in "${CARGO_VERSION}" "${PKG_XML_VERSION}" "${EXPECT_VERSION:-${VERSION}}"; do
+  if [[ "${v}" != "${VERSION}" ]]; then
+    echo "build-deb: version mismatch (pyproject=${VERSION}, Cargo.toml=${CARGO_VERSION}, package.xml=${PKG_XML_VERSION}, expected=${EXPECT_VERSION:-${VERSION}})" >&2
+    exit 1
+  fi
+done
 
 if [[ ! -f /opt/ros/humble/setup.bash ]]; then
   echo "build-deb: missing /opt/ros/humble/setup.bash" >&2
@@ -36,7 +50,7 @@ fi
 
 BASE="${ROOT}/.deb-build"
 rm -rf "${BASE}"
-colcon build \
+colcon --log-base "${BASE}/log" build \
   --base-paths "${ROOT}/ros2" \
   --build-base "${BASE}/build" \
   --install-base "${BASE}/install" \
@@ -51,13 +65,17 @@ if [[ ! -x "${BIN}" || ! -f "${MODEL}" ]]; then
   exit 1
 fi
 
+case "$(uname -m)" in
+  aarch64) ORT_ARCH=aarch64 ;;
+  x86_64) ORT_ARCH=x64 ;;
+  *) echo "build-deb: unsupported machine $(uname -m)" >&2; exit 1 ;;
+esac
+ORT_DIR="/opt/onnxruntime/onnxruntime-linux-${ORT_ARCH}-1.31.0/lib"
 ONNX_LIB=""
 for candidate in \
   "${ORT_DYLIB_PATH:-}" \
-  /opt/onnxruntime/onnxruntime-linux-aarch64-1.31.0/lib/libonnxruntime.so.1.31.0 \
-  /opt/onnxruntime/onnxruntime-linux-aarch64-1.31.0/lib/libonnxruntime.so \
-  /opt/onnxruntime/onnxruntime-linux-x64-1.31.0/lib/libonnxruntime.so.1.31.0 \
-  /opt/onnxruntime/onnxruntime-linux-x64-1.31.0/lib/libonnxruntime.so \
+  "${ORT_DIR}/libonnxruntime.so.1.31.0" \
+  "${ORT_DIR}/libonnxruntime.so" \
   /usr/lib/libonnxruntime.so; do
   if [[ -n "${candidate}" && -f "${candidate}" ]]; then
     ONNX_LIB="${candidate}"
@@ -142,7 +160,7 @@ Version: ${VERSION}
 Section: science
 Priority: optional
 Architecture: ${ARCH}
-Maintainer: legged-neural-odometry <dev@example.com>
+Maintainer: Deng Ran <deng_ran@aliyun.com>
 Depends: ${PKG_DEPENDS}
 Description: Unitree G1 neural planar odometry
  Subscribes to /lowstate and publishes nav_msgs/Odometry on /g1/odom.
@@ -194,5 +212,6 @@ EOF
 chmod 0755 "${STAGE}/DEBIAN/postinst" "${STAGE}/DEBIAN/prerm" "${STAGE}/DEBIAN/postrm"
 
 DEB_NAME="legged-neural-odometry_${VERSION}_${ARCH}.deb"
-fakeroot dpkg-deb --root-owner-group -Zxz -z9 --build "${STAGE}" "${ROOT}/${DEB_NAME}"
-echo "Wrote ${ROOT}/${DEB_NAME}" >&2
+mkdir -p "${ROOT}/dist"
+fakeroot dpkg-deb --root-owner-group -Zxz -z9 --build "${STAGE}" "${ROOT}/dist/${DEB_NAME}"
+echo "Wrote ${ROOT}/dist/${DEB_NAME}" >&2

@@ -3,6 +3,7 @@
   "render_gl": "osmesa",
   "render_width": 1280,
   "render_height": 720,
-  "render_fps": 30,
+  "render_fps": 15,
+  "render_shadows": false,
   "workers": 8
 }

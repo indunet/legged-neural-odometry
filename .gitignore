@@ -12,6 +12,7 @@ build/
 dist/
 target/
 .deb-build/
+dist/
 *.deb
 
 # Local configuration (copy configs/resources.example.json)
@@ -40,4 +41,3 @@ log/
 .idea/
 .vscode/
 
-# ONNX files under releases/ are intentional release artifacts.
