@@ -104,9 +104,18 @@ def build_model(policy):
         sensors = ET.SubElement(root, 'sensor')
     ET.SubElement(sensors, 'gyro', name='odom_gyro', site='odom_imu')
     ET.SubElement(sensors, 'accelerometer', name='odom_accel', site='odom_imu')
+    asset = root.find('asset')
+    if asset is None:
+        asset = ET.SubElement(root, 'asset')
+    # Official example-scene ground: blue-gray checker with a light edge (model/scene.xml).
+    ET.SubElement(asset, 'texture', name='groundplane', type='2d', builtin='checker', mark='edge',
+                  rgb1='0.2 0.3 0.4', rgb2='0.1 0.2 0.3', markrgb='0.8 0.8 0.8', width='300', height='300')
+    ET.SubElement(asset, 'material', name='groundplane', texture='groundplane', texuniform='true',
+                  texrepeat='5 5', reflectance='0.2')
     ET.SubElement(world, 'light', pos='0 0 5', dir='0 0 -1', directional='true')
     ET.SubElement(world, 'geom', name='floor', type='plane', size='100 100 .1', group='0',
-                  friction='.8 .005 .0001', rgba='.32 .35 .38 1', contype='1', conaffinity='1')
+                  material='groundplane', rgba='1 1 1 1', friction='.8 .005 .0001',
+                  contype='1', conaffinity='1')
     visual = ET.SubElement(root, 'visual')
     ET.SubElement(visual,'global',offwidth='960',offheight='640')
     return mujoco.MjModel.from_xml_string(ET.tostring(root, encoding='unicode'))

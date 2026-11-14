@@ -16,25 +16,6 @@ MAX_LAG=.5        # wall-clock seconds the simulation may fall behind before it 
 RECENT=750        # telemetry rows sent to the browser (15 s at 50 Hz), enough for the time-series charts
 TRACK_POINTS=2000 # the full-run trajectory is thinned by half whenever it grows past this many points
 
-GRID_HALF=12      # grid extends this many metres around the robot
-EYE=[1.,0.,0.,0.,1.,0.,0.,0.,1.]
-
-def add_grid(mujoco,scene,cx,cy,step=1.):
-    """The camera follows the robot over a featureless floor, so draw a 1 m world-fixed grid to make motion visible."""
-    import numpy as np
-    x0,y0=round(cx/step)*step,round(cy/step)*step;length=GRID_HALF*step
-    for i in range(-GRID_HALF,GRID_HALF+1):
-        major=(round(i+y0/step)%5==0,round(i+x0/step)%5==0)
-        for axis in (0,1):
-            if scene.ngeom>=scene.maxgeom:return
-            along=major[axis]  # lines every 5 m are brighter and thicker
-            width=.018 if along else .008;alpha=.55 if along else .28
-            size=[length,width,.0004] if axis==0 else [width,length,.0004]
-            pos=[x0,y0+i*step,.003] if axis==0 else [x0+i*step,y0,.003]
-            mujoco.mjv_initGeom(scene.geoms[scene.ngeom],mujoco.mjtGeom.mjGEOM_BOX,np.array(size),np.array(pos),
-                                np.array(EYE),np.array([.85,.92,1.,alpha],dtype=np.float32))
-            scene.ngeom+=1
-
 HEADING_GAIN=2.   # rad/s of yaw-rate correction per rad of heading error
 HEADING_LIMIT=.4  # rad/s
 
@@ -130,7 +111,6 @@ def run(folder):
             if now>=next_frame and (idle or behind<=RENDER_SLACK):
                 camera.lookat[:]=sim.data.xpos[sim.base]
                 renderer.update_scene(sim.data,camera=camera)
-                add_grid(mujoco,renderer.scene,*sim.data.xpos[sim.base][:2])
                 rgb=renderer.render();image=Image.fromarray(rgb);buf=io.BytesIO();image.save(buf,format='JPEG',quality=80)
                 tmp=folder/'frame.tmp.jpg';tmp.write_bytes(buf.getvalue());tmp.replace(folder/'frame.jpg')
                 next_frame=now+(.2 if idle else 1/fps)
